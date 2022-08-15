@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <NoWarn>CS8618</NoWarn>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.6" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.6" />
+        <PackageReference Include="System.Net.Ping" Version="4.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="index.html" />
+        <EmbeddedResource Include="bmonitor.js" />
+        <EmbeddedResource Include="bmonitor.css" />
+        <EmbeddedResource Include="favicon.ico" />
+        <EmbeddedResource Include="Static\monitors.html" />
+        <EmbeddedResource Include="Static\addmonitordialog.html" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BMonitor.DAL\BMonitor.DAL.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="MonitorSvc" />
+    </ItemGroup>
+
+</Project>

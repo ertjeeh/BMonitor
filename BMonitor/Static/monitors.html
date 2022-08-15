@@ -1,0 +1,53 @@
+﻿<div>
+    <table class="spacing">
+        <thead>
+            <tr>
+                <td>Id</td>
+                <td>Name</td>
+                <td>UpdateIntervalInMs</td>
+                <td>LastUpdate</td>
+                <td>Type</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+        <tbody id="monitor_table_body">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function InitPage() {
+        $("#main_content_title").html("Monitors");
+
+        FillMonitors();
+    }
+
+    var monitors;
+    function FillMonitors() {
+        var table_body = "";
+
+        $.get(apiLocation + "/Monitor")
+            .done(function (data) {
+                monitors = data;
+
+                monitors.forEach(m => {
+                    var row = `<tr>
+<td>${m.id}</td>
+<td>${m.name}</td>
+<td>${m.updateIntervalInMs}</td>
+<td>${m.lastUpdate}</td>
+<td>${m.monitorType}</td>
+<td><a href="#" onclick="EditMonitor('${m.id}')"><span class="neu-edit-ui">Edit...</span></a></td></tr>`;
+                    table_body += row;
+                });
+                $("#monitor_table_body").html(table_body);
+            });
+    }
+
+    function EditMonitor(id) {
+        $.get(apiLocation + "/Monitor/" + id)
+            .done(function (data) {
+                OpenAddMonitorDialog(() => FillMonitor(data));
+            });
+    }
+</script>

@@ -1,0 +1,21 @@
+﻿.gridcardstatus {
+    position: absolute;
+    bottom: 0;
+    font-size: 8px;
+    height: 18px;
+    width: 100px;
+    right: 0;
+    margin-right: 3px;
+}
+
+.iconcolor {
+    color: #424242;
+}
+
+.inputmarginbottom {
+    margin-bottom: 5px;
+}
+
+table.spacing td {
+    padding-left: 7px;
+}

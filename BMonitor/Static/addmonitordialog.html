@@ -1,0 +1,412 @@
+﻿<form name="add_monitor_form">
+    <p>
+        <fieldset>
+            <legend>Monitor type</legend>
+            <input type="radio" name="monitortype" id="mt_ping" value="mt_ping" style="margin: .4rem;" /><label for="mt_ping">Ping</label>
+            <input type="radio" name="monitortype" id="mt_folder" value="mt_folder" style="margin: .4rem;" /><label for="mt_folder">Folder</label>
+            <input type="radio" name="monitortype" id="mt_http" value="mt_http" style="margin: .4rem;" /><label for="mt_http">Http</label>
+            <input type="radio" name="monitortype" id="mt_sql" value="mt_sql" style="margin: .4rem;" /><label for="mt_sql">Sql</label>
+        </fieldset>
+    </p>
+    <p>
+        <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorName" placeholder="New monitor name" /><br />
+        <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorUpdateIntervalInMs" placeholder="Update interval (in ms.)" />
+
+        <!-- Ping -->
+        <div id="ping_input" style="display:none;">
+            <fieldset>
+                <legend>New Ping monitor</legend>
+                <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorPingEndpoint" placeholder="Endpoint to ping (ip/hostname)" /><br />
+                <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorPingTimeout" placeholder="Ping timeout (in ms.)" />
+            </fieldset>
+        </div>
+
+        <!-- Folder -->
+        <div id="folder_input" style="display:none;">
+            <fieldset>
+                <legend>New Folder monitor</legend>
+                <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorFolderPath" placeholder="Path to monitor" /><br />
+            </fieldset>
+        </div>
+
+        <!-- Http -->
+        <div id="http_input" style="display:none;">
+            <fieldset>
+                <legend>New Http monitor</legend>
+                <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorHttpEndpoint" placeholder="Endpoint to check (uri)" /><br />
+                <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorHttpExpectedStatusCode" placeholder="Expected status code" /><br />
+                <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorHttpTimeout" placeholder="Http timeout (in ms.)" /><br />
+            </fieldset>
+        </div>
+
+        <!-- Sql -->
+        <div id="sql_input" style="display:none;">
+            <fieldset>
+                <legend>New Sql monitor</legend>
+                <input class="inputmarginbottom" type="text" size="50" id="input_newMonitorSqlConnStr" placeholder="ConnectionString" /><br />
+                <textarea id="input_newMonitorSqlQuery" placeholder="Query to run"></textarea>
+            </fieldset>
+        </div>
+    </p>
+    <p>
+        <input type="button" id="submit_newMonitor" value="Create" onclick="AddMonitor()" />
+        <input type="button" id="submit_editMonitor" value="Update" onclick="DoEditMonitor()" />
+    </p>
+</form>
+<div id="addcard_dialog_message"></div>
+
+<script>
+    function InitializeAddDialog() {
+        var selectedNewType = "";
+        ShowButton();
+        UncheckHideAndEnableAll();
+        $("#submit_newMonitor").prop("disabled", true);
+        var rad = document.add_monitor_form.monitortype;
+        for (var i = 0; i < rad.length; i++) {
+            rad[i].addEventListener('change', function () {
+                selectedNewType = this.value;
+                HideAllInputs();
+                if (this.value == 'mt_ping') {
+                    $("#ping_input").show();
+                } else if (this.value == 'mt_folder') {
+                    $("#folder_input").show();
+                } else if (this.value == 'mt_http') {
+                    $("#http_input").show();
+                } else if (this.value == 'mt_sql') {
+                    $("#sql_input").show();
+                }
+                $("#submit_newMonitor").prop("disabled", false);
+            });
+        }
+    }
+
+    function HideAllInputs() {
+        $("#ping_input").hide();
+        $("#folder_input").hide();
+        $("#http_input").hide();
+        $("#sql_input").hide();
+    }
+
+    function ShowButton(newBtn = true) {
+        if (newBtn) {
+            $("#submit_newMonitor").show();
+            $("#submit_editMonitor").hide();
+        } else {
+            $("#submit_newMonitor").hide();
+            $("#submit_editMonitor").show();
+        }
+    }
+
+    function FillMonitor(monitor) {
+        $("#main_dialog_content").find('input:text').val('');
+        $("#main_dialog_content").find('textarea').val('');
+
+        $("#input_newMonitorName").val(monitor.name);
+        $("#input_newMonitorUpdateIntervalInMs").val(monitor.updateIntervalInMs);
+
+        UncheckHideAndEnableAll();
+        ShowButton(false);
+        $("#submit_editMonitor").attr("onclick", `DoEditMonitor('${monitor.id}')`);
+
+        if (monitor.monitorType == "PingMonitor") {
+            FillPingMonitor(monitor);
+        }
+        else if (monitor.monitorType == "FolderMonitor") {
+            FillFolderMonitor(monitor);
+        }
+        else if (monitor.monitorType == "HttpMonitor") {
+            FillHttpMonitor(monitor);
+        }
+        else if (monitor.monitorType == "SqlMonitor") {
+            FillSqlMonitor(monitor);
+        }
+    }
+
+    function UncheckHideAndEnableAll() {
+        $("#mt_ping").prop("checked", false);
+        $("#mt_folder").prop("checked", false);
+        $("#mt_http").prop("checked", false);
+        $("#mt_sql").prop("checked", false);
+
+        $("#mt_ping").prop("disabled", false);
+        $("#mt_folder").prop("disabled", false);
+        $("#mt_http").prop("disabled", false);
+        $("#mt_sql").prop("disabled", false);
+
+        HideAllInputs();
+    }
+
+    function FillPingMonitor(monitor) {
+        selectedNewType = 'mt_ping';
+        $("#mt_ping").prop("checked", true);
+        $("#mt_folder").prop("disabled", true);
+        $("#mt_http").prop("disabled", true);
+        $("#mt_sql").prop("disabled", true);
+
+        $("#input_newMonitorPingEndpoint").val(monitor.endpoint);
+        $("#input_newMonitorPingTimeout").val(monitor.timeoutInMs);
+        $("#ping_input").show();
+    }
+
+    function FillFolderMonitor(monitor) {
+        selectedNewType = 'mt_folder';
+        $("#mt_ping").prop("disabled", true);
+        $("#mt_folder").prop("checked", true);
+        $("#mt_http").prop("disabled", true);
+        $("#mt_sql").prop("disabled", true);
+
+        $("#input_newMonitorFolderPath").val(monitor.path);
+        $("#folder_input").show();
+    }
+
+    function FillHttpMonitor(monitor) {
+        selectedNewType = 'mt_http';
+        $("#mt_ping").prop("disabled", true);
+        $("#mt_folder").prop("disabled", true);
+        $("#mt_http").prop("checked", true);
+        $("#mt_sql").prop("disabled", true);
+
+        $("#input_newMonitorHttpEndpoint").val(monitor.endpoint);
+        $("#input_newMonitorHttpExpectedStatusCode").val(monitor.expectedStatusCode);
+        $("#input_newMonitorHttpTimeout").val(monitor.timeoutInMs);
+        $("#http_input").show();
+    }
+
+    function FillSqlMonitor(monitor) {
+        selectedNewType = 'mt_sql';
+        $("#mt_ping").prop("disabled", true);
+        $("#mt_folder").prop("disabled", true);
+        $("#mt_http").prop("disabled", true);
+        $("#mt_sql").prop("checked", true);
+
+        $("#input_newMonitorSqlConnStr").val(monitor.connectionString);
+        $("#input_newMonitorSqlQuery").val(monitor.query);
+        $("#sql_input").show();
+    }
+
+    function DoEditMonitor(id) {
+        if (selectedNewType == 'mt_ping') {
+            EditPingMonitor(id);
+        }
+        if (selectedNewType == 'mt_folder') {
+            EditFolderMonitor(id);
+        }
+        if (selectedNewType == 'mt_http') {
+            EditHttpMonitor(id);
+        }
+        if (selectedNewType == 'mt_sql') {
+            EditSqlMonitor(id);
+        }
+    }
+
+    function EditPingMonitor(id) {
+        $.ajax({
+            url: apiLocation + "/Monitor" + "/" + id,
+            type: "PATCH",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_ping",
+                PingEndpoint: $("#input_newMonitorPingEndpoint").val(),
+                PingTimeout: $("#input_newMonitorPingTimeout").val()
+            }),
+
+            success: function () {
+                RefreshMonitorsPage();
+                DialogInfo("Monitor updated.");
+                $("#submit_editMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+
+    function EditFolderMonitor(id) {
+        $.ajax({
+            url: apiLocation + "/Monitor" + "/" + id,
+            type: "PATCH",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_folder",
+                FolderPath: $("#input_newMonitorFolderPath").val()
+            }),
+
+            success: function () {
+                RefreshMonitorsPage();
+                DialogInfo("Monitor updated.");
+                $("#submit_editMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+
+    function EditHttpMonitor(id) {
+        $.ajax({
+            url: apiLocation + "/Monitor" + "/" + id,
+            type: "PATCH",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_http",
+                HttpEndpoint: $("#input_newMonitorHttpEndpoint").val(),
+                HttpExpectedStatusCode: $("#input_newMonitorHttpExpectedStatusCode").val(),
+                HttpTimeout: $("#input_newMonitorHttpTimeout").val()
+            }),
+
+            success: function () {
+                RefreshMonitorsPage();
+                DialogInfo("Monitor updated.");
+                $("#submit_editMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+
+    function EditSqlMonitor(id) {
+        $.ajax({
+            url: apiLocation + "/Monitor" + "/" + id,
+            type: "PATCH",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_sql",
+                SqlConnStr: $("#input_newMonitorSqlConnStr").val(),
+                SqlQuery: $("#input_newMonitorSqlQuery").val()
+            }),
+
+            success: function () {
+                RefreshMonitorsPage();
+                DialogInfo("Monitor updated.");
+                $("#submit_editMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+
+    function AddMonitor() {
+        if (selectedNewType == 'mt_ping') {
+            AddPingMonitor();
+        }
+        if (selectedNewType == 'mt_folder') {
+            AddFolderMonitor();
+        }
+        if (selectedNewType == 'mt_http') {
+            AddHttpMonitor();
+        }
+        if (selectedNewType == 'mt_sql') {
+            AddSqlMonitor();
+        }
+    }
+
+    function AddPingMonitor() {
+        $.ajax({
+            url: apiLocation + "/Monitor",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_ping",
+                PingEndpoint: $("#input_newMonitorPingEndpoint").val(),
+                PingTimeout: $("#input_newMonitorPingTimeout").val()
+            }),
+
+            success: function () {
+                DialogInfo("Monitor added.");
+                $("#submit_newMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+
+    function AddFolderMonitor() {
+        $.ajax({
+            url: apiLocation + "/Monitor",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_folder",
+                FolderPath: $("#input_newMonitorFolderPath").val()
+            }),
+
+            success: function () {
+                DialogInfo("Monitor added.");
+                $("#submit_newMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+
+    function AddHttpMonitor() {
+        $.ajax({
+            url: apiLocation + "/Monitor",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_http",
+                HttpEndpoint: $("#input_newMonitorHttpEndpoint").val(),
+                HttpExpectedStatusCode: $("#input_newMonitorHttpExpectedStatusCode").val(),
+                HttpTimeout: $("#input_newMonitorHttpTimeout").val()
+            }),
+
+            success: function () {
+                DialogInfo("Monitor added.");
+                $("#submit_newMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+
+    function AddSqlMonitor() {
+        $.ajax({
+            url: apiLocation + "/Monitor",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: $("#input_newMonitorName").val(),
+                UpdateIntervalInMs: $("#input_newMonitorUpdateIntervalInMs").val(),
+                MonitorType: "mt_sql",
+                SqlConnStr: $("#input_newMonitorSqlConnStr").val(),
+                SqlQuery: $("#input_newMonitorSqlQuery").val()
+            }),
+
+            success: function () {
+                DialogInfo("Monitor added.");
+                $("#submit_newMonitor").prop("disabled", true);
+            },
+
+            error: function (data) {
+                DialogError(data.responseText);
+            }
+        });
+    }
+</script>
