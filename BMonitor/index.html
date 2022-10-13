@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="/bmonitor/bmonitor.css">
+    <link rel="stylesheet" href="%%BasePathReplace%%/bmonitor/bmonitor.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gridstack.js/5.1.1/gridstack.min.css" integrity="sha512-fUN9aO64eYDb4vrlQrSuhabckaNlFo/+34YxvRZ4+l9mk8NZHsWVw1nIWLM++oN/1U5rY+Q+1bWFeLT+dA9YPQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css" />
@@ -46,7 +46,7 @@
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/bmonitor/bmonitor.js"></script>
+    <script type="text/javascript" src="%%BasePathReplace%%/bmonitor/bmonitor.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gridstack.js/5.1.1/gridstack-h5.min.js" integrity="sha512-WWbYIp3bGm8NEnr0t4yVcJ0GU0B/MzJTkCbRhDDqk2ygp3D6MBAHGCnmtBQg9Qf7k26IvJ845Adb/MmbeTgmQw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js" integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -109,6 +109,7 @@
 
     <script>
         $(document).ready(function () {
+            SaveBasePath('%%BasePathReplace%%');
             InitializeBMonitor();
         });
     </script>

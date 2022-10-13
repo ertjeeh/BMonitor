@@ -19,6 +19,11 @@ $(document).ready(function () {
     LoadSavedGrids();
 });
 
+function SaveBasePath(basePath) {
+    apiLocation = basePath + apiLocation;
+    staticLocation = basePath + staticLocation;
+}
+
 function LoadSavedGrids() {
     var gridCookie = getCookie("SavedGrids");
     if (gridCookie.length == 0) {

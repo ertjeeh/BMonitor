@@ -10,6 +10,8 @@ namespace BMonitor;
 
 public static class BMonitor
 {
+    private static string? _basePath = null;
+
     public static void AddBMonitorSqlite(this IServiceCollection serviceCollection)
     {
         SharedInitialize(serviceCollection);
@@ -25,6 +27,36 @@ public static class BMonitor
     private static void SharedInitialize(IServiceCollection serviceCollection)
     {
         serviceCollection.AddControllers();
+    }
+
+    private static string FindBasePath(string? pathBase)
+    {
+        if (pathBase == null)
+        {
+            _basePath = string.Empty;
+            return _basePath;
+        }
+
+        if (pathBase.Contains("bmonitor", StringComparison.InvariantCultureIgnoreCase))
+        {
+            pathBase = pathBase.Replace("bmonitor", string.Empty, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        if (pathBase.Length == 1)
+        {
+            _basePath = string.Empty;
+            return _basePath;
+        }
+
+        if (pathBase.Count(c => c.Equals('/')) == 1)
+        {
+            _basePath = pathBase;
+            return _basePath;
+        }
+
+        var indexOfSecondSlash = pathBase.IndexOf('/', pathBase.IndexOf('/') + 1);
+        _basePath = pathBase[..indexOfSecondSlash];
+        return _basePath;
     }
 
     public static void UseBMonitor(
@@ -55,6 +87,7 @@ public static class BMonitor
                     }
                     using var stream = new StreamReader(s);
                     var html = await stream.ReadToEndAsync();
+                    html = html.Replace("%%BasePathReplace%%", _basePath ?? FindBasePath(context.Request.PathBase.Value));
                     await context.Response.WriteAsync(html, Encoding.UTF8);
                 }
                 else
