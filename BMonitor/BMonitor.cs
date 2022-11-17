@@ -1,4 +1,5 @@
 ﻿using BMonitor.DAL;
+using BMonitor.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ public static class BMonitor
     private static void SharedInitialize(IServiceCollection serviceCollection)
     {
         serviceCollection.AddControllers();
+        serviceCollection.AddSingleton<ILoggerProvider, BMonitorLoggerProvider>();
     }
 
     private static string FindBasePath(string? pathBase)

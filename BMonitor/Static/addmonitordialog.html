@@ -57,14 +57,12 @@
 
 <script>
     function InitializeAddDialog() {
-        var selectedNewType = "";
         ShowButton();
         UncheckHideAndEnableAll();
         $("#submit_newMonitor").prop("disabled", true);
         var rad = document.add_monitor_form.monitortype;
         for (var i = 0; i < rad.length; i++) {
             rad[i].addEventListener('change', function () {
-                selectedNewType = this.value;
                 HideAllInputs();
                 if (this.value == 'mt_ping') {
                     $("#ping_input").show();
@@ -137,7 +135,6 @@
     }
 
     function FillPingMonitor(monitor) {
-        selectedNewType = 'mt_ping';
         $("#mt_ping").prop("checked", true);
         $("#mt_folder").prop("disabled", true);
         $("#mt_http").prop("disabled", true);
@@ -149,7 +146,6 @@
     }
 
     function FillFolderMonitor(monitor) {
-        selectedNewType = 'mt_folder';
         $("#mt_ping").prop("disabled", true);
         $("#mt_folder").prop("checked", true);
         $("#mt_http").prop("disabled", true);
@@ -160,7 +156,6 @@
     }
 
     function FillHttpMonitor(monitor) {
-        selectedNewType = 'mt_http';
         $("#mt_ping").prop("disabled", true);
         $("#mt_folder").prop("disabled", true);
         $("#mt_http").prop("checked", true);
@@ -173,7 +168,6 @@
     }
 
     function FillSqlMonitor(monitor) {
-        selectedNewType = 'mt_sql';
         $("#mt_ping").prop("disabled", true);
         $("#mt_folder").prop("disabled", true);
         $("#mt_http").prop("disabled", true);
@@ -185,18 +179,22 @@
     }
 
     function DoEditMonitor(id) {
-        if (selectedNewType == 'mt_ping') {
+        if (GetSelectedType() == 'mt_ping') {
             EditPingMonitor(id);
         }
-        if (selectedNewType == 'mt_folder') {
+        if (GetSelectedType() == 'mt_folder') {
             EditFolderMonitor(id);
         }
-        if (selectedNewType == 'mt_http') {
+        if (GetSelectedType() == 'mt_http') {
             EditHttpMonitor(id);
         }
-        if (selectedNewType == 'mt_sql') {
+        if (GetSelectedType() == 'mt_sql') {
             EditSqlMonitor(id);
         }
+    }
+
+    function GetSelectedType() {
+        return document.querySelector('input[name="monitortype"]:checked').value;
     }
 
     function EditPingMonitor(id) {
@@ -300,16 +298,16 @@
     }
 
     function AddMonitor() {
-        if (selectedNewType == 'mt_ping') {
+        if (GetSelectedType() == 'mt_ping') {
             AddPingMonitor();
         }
-        if (selectedNewType == 'mt_folder') {
+        if (GetSelectedType() == 'mt_folder') {
             AddFolderMonitor();
         }
-        if (selectedNewType == 'mt_http') {
+        if (GetSelectedType() == 'mt_http') {
             AddHttpMonitor();
         }
-        if (selectedNewType == 'mt_sql') {
+        if (GetSelectedType() == 'mt_sql') {
             AddSqlMonitor();
         }
     }

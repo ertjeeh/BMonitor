@@ -43,9 +43,9 @@ public class CreateMonitorModel
         {
             errorMessages.Add("UpdateIntervalInMs needs to have a number value.");
         }
-        else if (ui > 2000)
+        else if (ui < 2000)
         {
-            errorMessages.Add("UpdateIntervalInMs needs a value <= 2000");
+            errorMessages.Add("UpdateIntervalInMs needs a value >= 2000");
         }
 
         if (MonitorType == "mt_ping")

@@ -48,19 +48,26 @@ public class MonitorService : IHostedService
         _logger.LogInformation($"MainLoop started.");
         while (!_stopRequested)
         {
-            // remove
-            await Task.Delay(2500);
-
-            var monitorsToUpdate = await GetMonitorsToUpdate();
-            if (!monitorsToUpdate.Any())
+            try
             {
-                await Task.Delay(10);
-                continue;
+                // remove
+                await Task.Delay(2500);
+
+                var monitorsToUpdate = await GetMonitorsToUpdate();
+                if (!monitorsToUpdate.Any())
+                {
+                    await Task.Delay(10);
+                    continue;
+                }
+
+                var tasks = GetUpdateTasks(monitorsToUpdate);
+
+                await Task.WhenAll(tasks);
             }
-
-            var tasks = GetUpdateTasks(monitorsToUpdate);
-
-            await Task.WhenAll(tasks);
+            catch (Exception e)
+            {
+                _logger.LogError($"Error occured: {e}");
+            }
         }
     }
 
